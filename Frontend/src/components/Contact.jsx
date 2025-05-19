@@ -26,12 +26,11 @@ const Contact = () => {
         setMessage("");
         toast.success(res.data.message);
       })
-      .catch((error) => {
-        console.error(error);
-        toast.error(error.response.data.message);
-      });
+.catch((error) => {
+  console.error(error);
+  toast.error(error?.response?.data?.message || "Something went wrong");
+});
   };
-
   return (
     <section className="contact">
       <div className="container">
