@@ -15,7 +15,7 @@ export const createPlisioInvoice = async (req, res) => {
 
   try {
     const invoicePayload = new URLSearchParams({
-      api_key: String(API_KEY),
+      api_key: String(PLISIO_API_KEY),
       amount: String(amount),
       currency: String(currency),
       order_name: String(order_name),
