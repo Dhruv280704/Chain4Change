@@ -12,27 +12,36 @@ const Donate = () => {
     e.preventDefault();
     try {
       setDisableBtn(true);
-      await axios
-        .post(
-          "http://localhost:4000/api/v1/checkout",
-          {
-            name,
-            email,
-            message,
-            amount,
-          },
-          {
-            withCredentials: true,
-            headers: { "Content-Type": "application/json" },
-          }
-        )
-        .then((res) => {
-          console.log(res.data);
-          window.location.href = res.data.result.url;
-        });
+      const res = await axios.post(
+        "http://localhost:4000/api/v1/checkout",
+        {
+          name,
+          email,
+          message,
+          amount,
+          currency: "USD", // Required by backend/Plisio
+          order_name: name || "Donation", // Required by backend/Plisio
+        },
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      // If Plisio returns invoice URL in a different property, adjust accordingly
+      if (res.data?.result?.url) {
+        window.location.href = res.data.result.url;
+      } else if (res.data?.data?.invoice_url) {
+        window.location.href = res.data.data.invoice_url;
+      } else {
+        alert("Invoice URL not found in response.");
+      }
     } catch (error) {
       setDisableBtn(false);
       console.error(error);
+      alert(
+        error?.response?.data?.message ||
+          "Something went wrong while creating the invoice."
+      );
     }
   };
 
@@ -49,19 +58,22 @@ const Donate = () => {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="Enter Donation Amount (USD)"
+            required
           />
         </div>
         <input
-          type="email"
+          type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Your Name"
+          required
         />
         <input
-          type="text"
+          type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email Address"
+          required
         />
         <input
           type="text"
